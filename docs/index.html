@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaizen Copilot Studio</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="static/css/app.css">
+</head>
+<body>
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-row">
+        <button class="brand-logo-button" id="brandLogoButton" type="button" aria-label="Open sidebar">
+          <img src="static/assets/kaizen-logo.png" alt="Kaizen">
+        </button>
+        <button class="sidebar-toggle" id="sidebarToggle" type="button" title="Collapse sidebar" aria-label="Collapse sidebar">◧</button>
+      </div>
+      <button class="btn btn-primary full" id="newStudyBtn" type="button">New Study</button>
+      <nav class="nav-stack">
+        <button class="nav-btn active" data-route="workspace">Active Study</button>
+        <button class="nav-btn" data-route="dashboard">Dashboard</button>
+      </nav>
+      <div class="sidebar-footer">
+        <small>Static GitHub Pages mode stores study data in this browser.</small>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section id="workspaceRoute">
+        <div class="study-flow-topbar">
+          <div class="study-page-tabs" role="tablist" aria-label="Study sections">
+            <button class="study-page-tab active" data-study-page-target="details" type="button">Study Information</button>
+            <button class="study-page-tab" data-study-page-target="media" type="button">Upload Media</button>
+            <button class="study-page-tab" data-study-page-target="steps" type="button">Process Step</button>
+            <button class="study-page-tab" data-study-page-target="issues" type="button">Observed Problems</button>
+          </div>
+          <button class="btn btn-primary study-next-btn" id="studyNextBtn" type="button">Next</button>
+        </div>
+        <div class="workspace-grid single-column study-slide-shell" id="studySlideShell" data-active-page="details">
+          <section class="main-stack full-span">
+            <div class="study-page-grid">
+              <div class="panel details-panel details-panel-inline" data-study-panel="details">
+                <div class="panel-head study-head">
+                  <div>
+                    <h2>Study Details</h2>
+                    <p>Edit study information and sampling setup.</p>
+                  </div>
+                  <button class="btn btn-success" id="publishBtnInline" type="button">Publish Summary</button>
+                </div>
+                <div class="field-grid two">
+                  <label><span>Study title</span><input id="studyTitleInline" type="text"></label>
+                  <label><span>Owner</span><input id="studyOwnerInline" type="text"></label>
+                  <label><span>Plant / line</span><input id="studyLineInline" type="text"></label>
+                  <label><span>Area</span><input id="studyAreaInline" type="text"></label>
+                </div>
+                <label><span>Goal</span><textarea id="studyGoalInline"></textarea></label>
+                <div class="field-grid three">
+                  <label><span>Observation duration (min)</span><input id="studyDurationInline" type="number" min="1"></label>
+                  <label><span>Snapshot interval (sec)</span><input id="studyIntervalInline" type="number" min="1"></label>
+                  <label><span>Frames target</span><input id="studyFramesInline" type="number" min="0"></label>
+                </div>
+                <label><span>Sampling rule</span>
+                  <select id="studySamplingRuleInline">
+                    <option value="systematic">Systematic</option>
+                    <option value="manual">Manual review</option>
+                    <option value="random">Random</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="panel media-panel media-panel-half" data-study-panel="media">
+                <div class="panel-head slim media-head">
+                  <h2>Media Review</h2>
+                  <div class="tool-row wrap-end">
+                    <label class="btn btn-primary" id="uploadBtnLabel" for="videoInput">Upload Media</label>
+                    <input id="videoInput" type="file" accept="video/*" hidden>
+                    <button class="btn btn-danger icon" id="deleteVideoBtn" type="button" title="Delete media" aria-label="Delete media">🗑</button>
+                  </div>
+                </div>
+                <div class="preview-frame" id="mainVideoFrame">
+                  <div class="empty-state">Upload a video to begin.</div>
+                </div>
+                <div class="meta-line" id="videoMeta">No video uploaded.</div>
+              </div>
+            </div>
+
+            <div class="panel full-width-panel steps-panel" data-study-panel="steps">
+              <div class="panel-head slim">
+                <div>
+                  <h2>Process Steps</h2>
+                  <p>Build real interval-based clips from the uploaded study video, then refine each process step.</p>
+                </div>
+                <div class="tool-row wrap-end">
+                  <button class="btn" id="addStepBtn" type="button">Add Step</button>
+                  <button class="btn btn-primary" id="buildStepsBtn" type="button">Build Steps From Video</button>
+                </div>
+              </div>
+              <div class="status-chip" id="stepStatus">No process steps generated yet.</div>
+              <div class="process-layout expanded-process-layout">
+                <div class="panel inset-panel analysis-panel">
+                  <div class="subhead">
+                    <h3>Step Analysis</h3>
+                  </div>
+                  <div class="step-list" id="stepList"></div>
+                </div>
+
+                <div class="panel inset-panel editor-panel" id="editorPanel">
+                  <div class="empty-state tall">Build steps from the uploaded video to open the step editor.</div>
+                </div>
+
+                <div class="panel inset-panel clip-panel" id="clipPanel">
+                  <div class="subhead">
+                    <h3>Step Clip</h3>
+                    <p>Large focused preview for the selected process step.</p>
+                  </div>
+                  <div class="empty-state tall">No step clip available yet.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel observed-panel" data-study-panel="issues">
+              <div class="panel-head slim">
+                <div>
+                  <h2>Observed Problems</h2>
+                  <p>Add issues identified from the media review.</p>
+                </div>
+                <button class="btn" id="addIssueBtn" type="button">Add Issue</button>
+              </div>
+              <div id="issueList" class="issue-list"></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="dashboardRoute" class="hidden">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Studies</h2>
+              <p>Open any saved study from the folder-backed database.</p>
+            </div>
+          </div>
+          <div id="studyCards" class="study-card-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="studyDialog">
+    <form method="dialog" class="modal-card" id="studyForm">
+      <div class="modal-head">
+        <h3>Create Study</h3>
+        <button class="icon-close" type="button" id="closeStudyDialog">×</button>
+      </div>
+      <div class="field-grid two">
+        <label><span>Study title</span><input id="newTitle" type="text" required></label>
+        <label><span>Owner</span><input id="newOwner" type="text"></label>
+        <label><span>Plant / line</span><input id="newLine" type="text"></label>
+        <label><span>Area</span><input id="newArea" type="text"></label>
+      </div>
+      <label><span>Goal</span><textarea id="newGoal"></textarea></label>
+      <div class="field-grid three">
+        <label><span>Observation duration (min)</span><input id="newDuration" type="number" min="1" value="2"></label>
+        <label><span>Snapshot interval (sec)</span><input id="newInterval" type="number" min="1" value="15"></label>
+        <label><span>Frames target</span><input id="newFrames" type="number" min="0" value="0"></label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" type="button" id="cancelStudyDialog">Cancel</button>
+        <button class="btn btn-primary" type="submit">Create Study</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="issueDialog">
+    <form method="dialog" class="modal-card" id="issueForm">
+      <div class="modal-head">
+        <h3>Add Issue</h3>
+        <button class="icon-close" type="button" id="closeIssueDialog">×</button>
+      </div>
+      <label><span>Issue title</span><input id="issueTitle" type="text" required></label>
+      <label><span>Issue detail</span><textarea id="issueDetail"></textarea></label>
+      <div class="field-grid two">
+        <label><span>Priority</span>
+          <select id="issuePriority">
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </label>
+        <label><span>Status</span>
+          <select id="issueStatus">
+            <option value="todo">To do</option>
+            <option value="doing">Doing</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" type="button" id="cancelIssueDialog">Cancel</button>
+        <button class="btn btn-primary" type="submit">Save Issue</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="publishDialog">
+    <div class="modal-card large publish-modal">
+      <div class="modal-head">
+        <h3>Publish Summary</h3>
+        <button class="icon-close" type="button" id="closePublishDialog">×</button>
+      </div>
+      <div id="publishBody" class="publish-body"></div>
+    </div>
+  </dialog>
+
+  <script src="static/js/app.js"></script>
+</body>
+</html>
